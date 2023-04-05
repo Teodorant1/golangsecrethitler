@@ -286,7 +286,7 @@ func (match *Match) addplayer(player Player) {
 	if len(match.players) < 10 {
 		match.players[player.name] = &player
 	}
-
+	fmt.Println("bazinga")
 }
 func (match *Match) getPresidents(president string) (int, int, []string) {
 	var playernames2 []string
