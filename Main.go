@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+
 	matches := make(map[string]*Match)
 	server := http.NewServeMux()
 	matchhandler := matchHandler{matches: matches}
@@ -26,10 +27,3 @@ func main() {
 	}()
 
 }
-
-//func headers(w http.ResponseWriter, req *http.Request  ) {
-//	body1, _ := io.ReadAll(req.Body)
-////	//	fmt.Println(string(body1))
-//	strings = append(strings, string(body1))
-//	fmt.Println(strings)
-//}

@@ -1,6 +1,9 @@
 package main
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type exportJson struct {
 	Playernames       []string
@@ -65,7 +68,11 @@ func (exporter *exporter) getExportJsonStruct(request request, match *Match) exp
 }
 
 func (exporter *exporter) transformExportIntoJson(exportJson exportJson) []uint8 {
-	reply, _ := json.Marshal(exportJson)
+	reply, err := json.Marshal(exportJson)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
 	return reply
 

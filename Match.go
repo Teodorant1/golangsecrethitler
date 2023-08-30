@@ -165,12 +165,6 @@ func (match *Match) central_methodv2(request request) {
 			}
 		}
 	}
-	//	_, nextpresidentIndex, playernames2 := match.getPresidents(match.election.lastnormalpresident)
-	//
-	//	match.president = match.players[playernames2[nextpresidentIndex]]
-	//	match.currentaction = "waiting for president to pick a chancellor"
-	//	match.stage = match.game_stage_enum.election()
-	//	match.substage = 1
 
 	if match.stage == match.game_stage_enum.policy() && match.substage == 2 && match.chancellor.name == request.name {
 		if request.action == "veto" {
@@ -245,7 +239,6 @@ func (match *Match) central_methodv2(request request) {
 
 }
 
-// func (match *Match) checkIfPowerEnabled() []string {}
 func (match *Match) getCandidatesForChancellor() []string {
 
 	var playernames2 []string
@@ -258,7 +251,6 @@ func (match *Match) getCandidatesForChancellor() []string {
 	return playernames2
 }
 func (match *Match) collapsegovernment() {
-	//also gotta do the random policy here
 
 	if match.policies[0] == "fascist" {
 		match.fashDecs++
@@ -386,7 +378,6 @@ func (match *Match) calcFashNumbers() int {
 func (match *Match) contains_player(m map[string]*Player, suspect string) bool {
 
 	if _, ok := m[suspect]; ok {
-		//	fmt.Printf("Value is : %s \n", v)
 		return true
 	} else {
 		fmt.Println("Key not found")
@@ -403,15 +394,13 @@ func (match *Match) randomize_players() {
 }
 func (match *Match) randomizepolicies() {
 
-	// rand.Seed()
 	rand.Shuffle(len(match.policies), func(i, j int) {
 		match.policies[i], match.policies[j] = match.policies[j], match.policies[i]
 	})
 }
 
 func (match *Match) LaunchGame() {
-	// this commented piece of code needs to be in the constructor
-	//	match.players = make(map[string]*Player)
+
 	for k := range match.players {
 		match.playernames = append(match.playernames, k)
 	}
