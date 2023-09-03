@@ -6,6 +6,9 @@ import (
 )
 
 func main() {
+	morseconverter := MorseConverter{}
+
+	morseconverter.convertIntoMorseCode("Snape killed dumbledore")
 
 	matches := make(map[string]*Match)
 	server := http.NewServeMux()
