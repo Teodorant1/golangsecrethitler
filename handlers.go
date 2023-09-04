@@ -52,6 +52,7 @@ func (matchHandler matchHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 				matchHandler.matches[request.gameid].addplayer(Player{
 					password: request.playerpassword,
 					name:     request.name,
+					isAlive:  true,
 				})
 				matchHandler.matches[request.gameid].playernames =
 					append(matchHandler.matches[request.gameid].playernames, request.name)
@@ -72,7 +73,7 @@ func (matchHandler matchHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 
 				reply := e.transformExportIntoJson(exportJsonstruct)
 
-				w.Write((reply))
+				w.Write(reply)
 
 			}
 

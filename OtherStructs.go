@@ -34,8 +34,8 @@ func (exporter *exporter) getExportJsonStruct(request request, match *Match) exp
 	var votes []string = nil
 
 	if !(match.stage == match.game_stage_enum.election()) {
-		for i := range votes {
-			votes[i] = votes[i] + match.players[votes[i]].votedFor
+		for i := range match.players {
+			votes = append(votes, match.players[i].name+"  "+match.players[i].votedFor)
 		}
 	}
 
@@ -45,6 +45,7 @@ func (exporter *exporter) getExportJsonStruct(request request, match *Match) exp
 	if request.name == match.chancellor.name {
 		rolepolicies = match.chancellor.policies
 	}
+
 	return exportJson{
 		Playernames:       playernames2,
 		Libdecs:           match.libDecs,
@@ -54,12 +55,11 @@ func (exporter *exporter) getExportJsonStruct(request request, match *Match) exp
 		President:         match.president.name,
 		Chancellor:        match.chancellor.name,
 		Fashpowers:        match.FashPowers,
-		Intel:             match.players[request.name].intel,
 		Votes:             votes,
 		RolePolicies:      rolepolicies,
-
-		WaitingFor:    match.waitingfor,
-		CurrentAction: match.currentaction,
+		Intel:             match.players[request.name].intel,
+		WaitingFor:        match.waitingfor,
+		CurrentAction:     match.currentaction,
 
 		Stage:       match.stage,
 		Substage:    match.substage,

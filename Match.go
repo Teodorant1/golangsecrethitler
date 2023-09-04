@@ -278,16 +278,17 @@ func (match *Match) addplayer(player Player) {
 	if len(match.players) < 10 {
 		match.players[player.name] = &player
 	}
-	fmt.Println("bazinga")
 }
 func (match *Match) getPresidents(president string) (int, int, []string) {
 	var playernames2 []string
 	for i := 0; i < len(match.playernames); i++ {
 		if match.players[match.playernames[i]].isAlive == true {
 			playernames2 = append(playernames2, match.playernames[i])
+
 		}
 
 	}
+
 	presidentIndex := 0
 	nextpresidentIndex := 1
 	for i := 0; i < len(playernames2); i++ {
@@ -301,7 +302,6 @@ func (match *Match) getPresidents(president string) (int, int, []string) {
 	} else {
 		nextpresidentIndex = presidentIndex + 1
 	}
-
 	return presidentIndex, nextpresidentIndex, playernames2
 }
 
@@ -401,11 +401,13 @@ func (match *Match) randomizepolicies() {
 
 func (match *Match) LaunchGame() {
 
+	nobody := &Player{name: "nobody"}
+	match.chancellor = nobody
+
 	for k := range match.players {
 		match.playernames = append(match.playernames, k)
 	}
 	match.randomize_players()
-
 	fashnumbers := match.calcFashNumbers()
 	match.hitler = match.players[match.playernames[0]]
 	match.players[match.playernames[0]].isHitler = true
