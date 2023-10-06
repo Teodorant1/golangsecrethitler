@@ -90,7 +90,7 @@ type election struct {
 type Player struct {
 	password      string
 	name          string
-	party         string
+	isFascist     bool
 	isHitler      bool
 	isAlive       bool
 	hasVoted      bool

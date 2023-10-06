@@ -7,6 +7,30 @@ import (
 	"net/http"
 )
 
+type MatchConfig struct {
+	PresidentTitle  string
+	ChancellorTitle string
+	EvilLeaderName  string
+	EvilFactionName string
+	GoodFactionName string
+	EvilLogoURL     string
+	GoodLogoURL     string
+	EvilLeaderArt   string
+	ProfileIcons    []string
+}
+
+func (MatchConfig *MatchConfig) LoadDefaultSettings() {
+	MatchConfig.PresidentTitle = "President"
+	MatchConfig.ChancellorTitle = "Chancellor"
+	MatchConfig.EvilLeaderName = "Hitler"
+	MatchConfig.EvilFactionName = "Fascists"
+	MatchConfig.GoodFactionName = "Liberals"
+	MatchConfig.EvilLogoURL = "TBA"
+	MatchConfig.GoodLogoURL = "TBA"
+	MatchConfig.EvilLeaderArt = "TBA"
+	MatchConfig.ProfileIcons = append(MatchConfig.ProfileIcons, "TBA")
+}
+
 type matchHandler struct {
 	matches map[string]*Match
 }
@@ -15,7 +39,7 @@ type matchHandler struct {
 // create game, join game, start game, mutate game , get game state
 //
 //	w.Write([]byte("The time is: "))
-func (matchHandler matchHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (matchHandler *matchHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	body1, err1 := io.ReadAll(r.Body)
 
@@ -45,6 +69,7 @@ func (matchHandler matchHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 				playernames:            []string{request.name},
 				scheduled_for_deletion: false,
 			}
+			matchHandler.matches[request.gameid].MatchConfig.LoadDefaultSettings()
 		}
 		if matchHandler.matches[request.gameid].password == request.gamepassword {
 			if request.category == "join" {

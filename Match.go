@@ -31,9 +31,11 @@ type Match struct {
 	chancellorWantsVeto    bool
 	game_stage_enum        game_stage_enum
 	fash_stage_enum        fash_stage_enum
+	request_enum           request_dot_action_enum
 	election               election
 	waitingfor             string
 	currentaction          string
+	MatchConfig            MatchConfig
 }
 
 func (match *Match) central_method(request request) {
@@ -48,7 +50,7 @@ func (match *Match) central_method(request request) {
 }
 
 func (match *Match) central_methodv2(request request) {
-	if match.stage == match.game_stage_enum.election() && match.substage == 1 && request.action == "nominatechancellor" {
+	if match.stage == match.game_stage_enum.election() && match.substage == 1 && request.action == match.request_enum.nominate_chancellor() {
 		if match.president.password == request.playerpassword && match.password == request.gamepassword {
 			match.chancellor = match.players[request.target]
 			match.waitingfor = "all"
@@ -56,7 +58,7 @@ func (match *Match) central_methodv2(request request) {
 			match.substage = 2
 		}
 	}
-	if match.substage == 2 && match.players[request.name].hasVoted == false && request.action == "vote" {
+	if match.substage == 2 && match.players[request.name].hasVoted == false && request.action == match.request_enum.vote() {
 		if request.target == "ja" {
 			match.election.ja++
 			match.players[request.name].votedFor = "ja"
@@ -82,7 +84,7 @@ func (match *Match) central_methodv2(request request) {
 				}
 
 				match.waitingfor = match.president.name
-				match.currentaction = "president is looking at top 3 cards of the deck"
+				match.currentaction = match.MatchConfig.PresidentTitle + " is looking at top 3 cards of the deck"
 				match.stage = match.game_stage_enum.policy()
 				match.substage = 1
 
@@ -127,7 +129,7 @@ func (match *Match) central_methodv2(request request) {
 
 	if match.stage == match.game_stage_enum.policy() && match.substage == 1 && match.president.name == request.name {
 
-		if request.action == "pickpolicy" {
+		if request.action == match.request_enum.pickpolicy() {
 			match.discardedpolicies = append(match.discardedpolicies, match.president.policies[request.policyindex])
 			match.president.policies = append(match.president.policies[:request.policyindex], match.president.policies[request.policyindex+1:]...)
 			for _, policy := range match.president.policies {
@@ -135,12 +137,12 @@ func (match *Match) central_methodv2(request request) {
 			}
 			match.president.policies = nil
 			match.waitingfor = match.chancellor.name
-			match.currentaction = "chancellor is picking 1 from 2 policies passed to them from the president to pass as a law"
+			match.currentaction = match.MatchConfig.ChancellorTitle + " is picking 1 from 2 policies passed to them from the " + match.MatchConfig.PresidentTitle + " to pass as a law"
 			match.substage = 2
 
 		}
 
-		if request.action == "veto" {
+		if request.action == match.request_enum.veto() {
 			if match.vetoEnabled == true && match.chancellorWantsVeto == true {
 				match.chancellorWantsVeto = false
 				for i := range match.chancellor.policies {
@@ -158,7 +160,7 @@ func (match *Match) central_methodv2(request request) {
 
 				if match.election.failedelections < 3 {
 					match.president = match.players[playernames2[nextpresidentIndex]]
-					match.currentaction = "waiting for president to pick a chancellor"
+					match.currentaction = "waiting for " + match.MatchConfig.PresidentTitle + " to pick a " + match.MatchConfig.ChancellorTitle
 					match.stage = match.game_stage_enum.election()
 					match.substage = 1
 				}
@@ -167,11 +169,11 @@ func (match *Match) central_methodv2(request request) {
 	}
 
 	if match.stage == match.game_stage_enum.policy() && match.substage == 2 && match.chancellor.name == request.name {
-		if request.action == "veto" {
+		if request.action == match.request_enum.veto() {
 			match.chancellorWantsVeto = true
 			match.waitingfor = match.chancellor.name + " or " + match.president.name
 		}
-		if request.action == "pickpolicy" {
+		if request.action == match.request_enum.pickpolicy() {
 			match.chancellorWantsVeto = false
 
 			if match.chancellor.policies[request.policyindex] == "fascist" {
@@ -187,7 +189,7 @@ func (match *Match) central_methodv2(request request) {
 
 						_, nextpresidentIndex, playernames2 := match.getPresidents(match.election.lastnormalpresident)
 						match.president = match.players[playernames2[nextpresidentIndex]]
-						match.currentaction = "waiting for president to pick a chancellor"
+						match.currentaction = "waiting for " + match.MatchConfig.PresidentTitle + " to pick a " + match.MatchConfig.ChancellorTitle
 						match.stage = match.game_stage_enum.election()
 						match.substage = 1
 
@@ -201,7 +203,7 @@ func (match *Match) central_methodv2(request request) {
 				if match.FashPowers[match.fashDecs] == match.fash_stage_enum.none() {
 					_, nextpresidentIndex, playernames2 := match.getPresidents(match.election.lastnormalpresident)
 					match.president = match.players[playernames2[nextpresidentIndex]]
-					match.currentaction = "waiting for president to pick a chancellor"
+					match.currentaction = "waiting for " + match.MatchConfig.PresidentTitle + " to pick a " + match.MatchConfig.ChancellorTitle
 					match.stage = match.game_stage_enum.election()
 					match.substage = 1
 				}
@@ -211,7 +213,7 @@ func (match *Match) central_methodv2(request request) {
 				match.libDecs++
 				_, nextpresidentIndex, playernames2 := match.getPresidents(match.election.lastnormalpresident)
 				match.president = match.players[playernames2[nextpresidentIndex]]
-				match.currentaction = "waiting for president to pick a chancellor"
+				match.currentaction = "waiting for " + match.MatchConfig.PresidentTitle + " to pick a " + match.MatchConfig.ChancellorTitle
 				match.stage = match.game_stage_enum.election()
 				match.substage = 1
 			}
@@ -228,11 +230,11 @@ func (match *Match) central_methodv2(request request) {
 
 		}
 	}
-	if match.stage == match.game_stage_enum.fascistpower() && request.playerpassword == match.president.password && request.action == "fascistpower" {
+	if match.stage == match.game_stage_enum.fascistpower() && request.playerpassword == match.president.password && request.action == match.request_enum.fascistpower() {
 		match.handleFascistPower(request)
 		_, nextpresidentIndex, playernames2 := match.getPresidents(match.election.lastnormalpresident)
 		match.president = match.players[playernames2[nextpresidentIndex]]
-		match.currentaction = "waiting for president to pick a chancellor"
+		match.currentaction = "waiting for " + match.MatchConfig.PresidentTitle + " to pick a " + match.MatchConfig.ChancellorTitle
 		match.stage = match.game_stage_enum.election()
 		match.substage = 1
 	}
@@ -267,7 +269,7 @@ func (match *Match) collapsegovernment() {
 	}
 
 	match.waitingfor = match.president.name
-	match.currentaction = "waiting for president to pick a chancellor"
+	match.currentaction = "waiting for " + match.MatchConfig.PresidentTitle + " to pick a " + match.MatchConfig.ChancellorTitle
 	match.stage = match.game_stage_enum.election()
 	match.substage = 1
 }
@@ -306,7 +308,7 @@ func (match *Match) getPresidents(president string) (int, int, []string) {
 }
 
 func (match *Match) getlivingplayers() int {
-	var aliveNumbers int = 0
+	aliveNumbers := 0
 	for _, v := range match.players {
 		if v.isAlive == true {
 			aliveNumbers++
@@ -322,7 +324,14 @@ func (match *Match) handleFascistPower(request request) {
 	}
 
 	if match.FashPowers[match.fashDecs] == match.fash_stage_enum.spyguy() {
-		intel := "The party affiliation of " + request.target + " is " + match.players[request.target].party
+		//intel := "The party affiliation of " + request.target + " is " + match.players[request.target].party
+		intel := ""
+		if match.players[request.target].isFascist == true {
+			intel = request.target + " is a member of the " + match.MatchConfig.EvilFactionName + " faction"
+		}
+		if match.players[request.target].isFascist == false {
+			intel = request.target + " is a member of the " + match.MatchConfig.GoodFactionName + " faction"
+		}
 		match.players[request.name].intel = append(match.players[request.name].intel, intel)
 	}
 	if match.FashPowers[match.fashDecs] == match.fash_stage_enum.special_election() {
@@ -411,10 +420,10 @@ func (match *Match) LaunchGame() {
 	fashnumbers := match.calcFashNumbers()
 	match.hitler = match.players[match.playernames[0]]
 	match.players[match.playernames[0]].isHitler = true
-	match.players[match.playernames[0]].party = "fascist"
+	match.players[match.playernames[0]].isFascist = true
 
 	for helpers := 1; helpers < fashnumbers+1; helpers++ {
-		match.players[match.playernames[helpers]].party = "fascist"
+		match.players[match.playernames[helpers]].isFascist = true
 	}
 	match.randomize_players()
 	match.president = match.players[match.playernames[0]]
@@ -428,27 +437,27 @@ func (match *Match) LaunchGame() {
 
 	match.randomizepolicies()
 	match.waitingfor = match.president.name
-	match.currentaction = "waiting for president to pick a chancellor"
+	match.currentaction = "waiting for " + match.MatchConfig.PresidentTitle + " to pick a " + match.MatchConfig.ChancellorTitle
 	match.stage = match.game_stage_enum.election()
 	match.substage = 1
 	var fascists []string
 	for _, player := range match.players {
 
 		if len(match.players) > 6 {
-			if player.party == "fascist" && player.isHitler == false {
+			if player.isFascist == true && player.isHitler == false {
 				fascists = append(fascists, player.name)
 			}
 		}
 
 		if len(match.players) < 7 {
-			if player.party == "fascist" {
+			if player.isFascist == true {
 				fascists = append(fascists, player.name)
 			}
 		}
 
 	}
-	var intel = " The fascists are : "
-	var hitlerintel = "Hitler is actually : " + match.hitler.name
+	var intel = " The " + match.MatchConfig.EvilFactionName + " are : "
+	var hitlerintel = match.MatchConfig.EvilLeaderName + "is actually : " + match.hitler.name
 	for i := range fascists {
 		intel = intel + fascists[i] + " , "
 	}

@@ -1,8 +1,17 @@
 package main
 
 func main() {
+	//todo for this project
+	// 1. we need to add dynamic rendering on the frontend and wire up all of the REST api calls
+	// 2. add tests as a form of sanity check to make sure everything is working
+	// 3. setup some presets and secure art Assets
+	// 4. setup MYSQL for the presets
+	// 5. thorougly comment the code and add links to original board game documentation
+	// 6. add more ATMOSPHERE
+	// 7. ??
+	// 8. Profit
 
-	Testr := tester{}
+	Testr := &tester{}
 	Testr.testMatch()
 
 	//	morseconverter := MorseConverter{}

@@ -1,7 +1,27 @@
 package main
 
 type fash_stage_enum struct{}
+type game_stage_enum struct{}
+type request_dot_action_enum struct{}
 
+func (reqActEnum request_dot_action_enum) nominate_chancellor() string {
+	return "nominatechancellor"
+}
+
+func (reqActEnum request_dot_action_enum) pickpolicy() string {
+	return "pickpolicy"
+}
+func (reqActEnum request_dot_action_enum) veto() string {
+	return "veto"
+}
+func (reqActEnum request_dot_action_enum) fascistpower() string {
+	return "fascistpower"
+}
+func (reqActEnum request_dot_action_enum) vote() string {
+	return "vote"
+}
+
+// ///////////////////////////////////////////////////////////////
 func (fsg fash_stage_enum) murder() string {
 	return "murder"
 }
@@ -25,8 +45,7 @@ func (fsg fash_stage_enum) none() string {
 	return "none"
 }
 
-type game_stage_enum struct {
-}
+///////////////////////////////////////////////////////////
 
 func (gse game_stage_enum) election() string {
 	return "election"
