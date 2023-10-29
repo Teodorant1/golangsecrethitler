@@ -30,12 +30,12 @@ type Match struct {
 	vetoEnabled            bool
 	chancellorWantsVeto    bool
 	game_stage_enum        game_stage_enum
-	fash_stage_enum        fash_stage_enum
+	fash_stage_enum        fash_power_enum
 	request_enum           request_dot_action_enum
 	election               election
 	waitingfor             string
 	currentaction          string
-	MatchConfig            MatchConfig
+	MatchConfig
 }
 
 func (match *Match) central_method(request request) {
@@ -327,10 +327,10 @@ func (match *Match) handleFascistPower(request request) {
 		//intel := "The party affiliation of " + request.target + " is " + match.players[request.target].party
 		intel := ""
 		if match.players[request.target].isFascist == true {
-			intel = request.target + " is a member of the " + match.MatchConfig.EvilFactionName + " faction"
+			intel = request.target + " is a member of the " + match.EvilFactionName + " faction"
 		}
 		if match.players[request.target].isFascist == false {
-			intel = request.target + " is a member of the " + match.MatchConfig.GoodFactionName + " faction"
+			intel = request.target + " is a member of the " + match.GoodFactionName + " faction"
 		}
 		match.players[request.name].intel = append(match.players[request.name].intel, intel)
 	}

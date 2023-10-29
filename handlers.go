@@ -39,7 +39,7 @@ type matchHandler struct {
 // create game, join game, start game, mutate game , get game state
 //
 //	w.Write([]byte("The time is: "))
-func (matchHandler *matchHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (matchHandler matchHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	body1, err1 := io.ReadAll(r.Body)
 
@@ -69,7 +69,8 @@ func (matchHandler *matchHandler) ServeHTTP(w http.ResponseWriter, r *http.Reque
 				playernames:            []string{request.name},
 				scheduled_for_deletion: false,
 			}
-			matchHandler.matches[request.gameid].MatchConfig.LoadDefaultSettings()
+			matchHandler.matches[request.gameid].LoadDefaultSettings()
+
 		}
 		if matchHandler.matches[request.gameid].password == request.gamepassword {
 			if request.category == "join" {

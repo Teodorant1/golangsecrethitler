@@ -55,11 +55,12 @@ func (exporter *exporter) getExportJsonStruct(request request, match *Match) exp
 		President:         match.president.name,
 		Chancellor:        match.chancellor.name,
 		Fashpowers:        match.FashPowers,
+		Intel:             match.players[request.name].intel,
 		Votes:             votes,
 		RolePolicies:      rolepolicies,
-		Intel:             match.players[request.name].intel,
-		WaitingFor:        match.waitingfor,
-		CurrentAction:     match.currentaction,
+
+		WaitingFor:    match.waitingfor,
+		CurrentAction: match.currentaction,
 
 		Stage:       match.stage,
 		Substage:    match.substage,
